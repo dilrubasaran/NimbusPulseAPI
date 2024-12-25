@@ -3,8 +3,8 @@
     public class User
     {
             public int Id { get; set; }
-            public string FirstName { get; set; } // Kullanıcı adı
-            public string UserName { get; set; } // Kullanıcı soyadı
+            public string Name { get; set; } // Kullanıcı adı
+            public string SurName { get; set; } // Kullanıcı soyadı
             public string Password { get; set; } // Şifre
             public string Email { get; set; } // E-posta
             public string PhoneNumber { get; set; } // Telefon numarası

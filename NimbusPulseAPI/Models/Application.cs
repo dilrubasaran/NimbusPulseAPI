@@ -4,13 +4,14 @@
     {
         public int Id { get; set; }
         public int DeviceId { get; set; }
-        public string Name { get; set; } // Uygulama adı
-        public string Status { get; set; } // Örn. "Aktif", "Arka Plan "
-        public TimeSpan Duration { get; set; } // Çalışma süresi
+        public string Name { get; set; }
+        public string Status { get; set; } // Örn. "Aktif", "Pasif"
+        public TimeSpan Duration { get; set; }
         public double CpuUsagePercentage { get; set; }
         public double RamUsagePercentage { get; set; }
 
-        public Device Device { get; set; } // Navigasyon özelliği
+        public Device Device { get; set; }
     }
+
 
 }

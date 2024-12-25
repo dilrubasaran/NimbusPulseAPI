@@ -1,0 +1,11 @@
+﻿### Tüm kullanıcıları getiren GET isteği
+GET http://localhost:5000/api/user
+Accept: application/json
+
+### Kullanıcı ekleyen POST isteği
+POST http://localhost:5000/api/user/add-initial-users
+Content-Type: application/json
+
+### Tek bir kullanıcıyı (ID = 3) getiren GET isteği
+GET http://localhost:5000/api/user/3
+Accept: application/json
