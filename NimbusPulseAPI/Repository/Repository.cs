@@ -1,57 +1,46 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
 using NimbusPulseAPI.Context;
-using System.Linq.Expressions;
+using NimbusPulseAPI.Repository;
 
-namespace NimbusPulseAPI.Repository
+public class Repository<T> : IRepository<T> where T : class
 {
-    public class Repository<T> : IRepository<T> where T : class
+    private readonly AppDbContext _context;
+
+    public Repository(AppDbContext context)
     {
-        private readonly AppDbContext _context;
-        private readonly DbSet<T> _dbSet;
+        _context = context;
+    }
 
-        public Repository(AppDbContext context)
-        {
-            _context = context;
-            _dbSet = _context.Set<T>();
-        }
+    public async Task<IQueryable<T>> GetAllAsync()
+    {
+        return _context.Set<T>();
+    }
 
-        public async Task<IQueryable<T>> GetAllAsync()
-        {
-            return await Task.FromResult(_dbSet.AsQueryable());
-        }
+    public async Task<T?> GetByIdAsync(int id)
+    {
+        return await _context.Set<T>().FindAsync(id);
+    }
 
-        // Asenkron olarak belirli bir ID'ye göre veri döner
-        public async Task<T?> GetByIdAsync(int id)
-        {
-            return await _dbSet.FindAsync(id);
-        }
+    public async Task<IQueryable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    {
+        return _context.Set<T>().Where(predicate);
+    }
 
+    public async Task AddAsync(T entity)
+    {
+        await _context.Set<T>().AddAsync(entity);
+        await _context.SaveChangesAsync();
+    }
 
-        // Asenkron olarak filtreli veri döner
-        public async Task<IQueryable<T>> FindAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await Task.FromResult(_dbSet.Where(predicate).AsQueryable());
-        }
+    public async Task UpdateAsync(T entity) // Add this method
+    {
+        _context.Set<T>().Update(entity);
+        await _context.SaveChangesAsync();
+    }
 
-        // Yeni bir varlık ekler
-        public async Task AddAsync(T entity)
-        {
-            await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        // Var olan bir varlığı günceller
-        public async Task UpdateAsync(T entity)
-        {
-            _dbSet.Update(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        // Var olan bir varlığı siler
-        public async Task DeleteAsync(T entity)
-        {
-            _dbSet.Remove(entity);
-            await _context.SaveChangesAsync();
-        }
+    public async Task DeleteAsync(T entity)
+    {
+        _context.Set<T>().Remove(entity);
+        await _context.SaveChangesAsync();
     }
 }

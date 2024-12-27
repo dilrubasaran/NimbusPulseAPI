@@ -1,157 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using NimbusPulseAPI.Context;
-using NimbusPulseAPI.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using NimbusPulseAPI.Models;
+using NimbusPulseAPI.Services;
 
-namespace NimbusPulseAPI.Controllers
+[Route("api/[controller]")]
+[ApiController]
+public class DeviceController : ControllerBase
 {
-    public class DeviceController : Controller
+    private readonly IDeviceService _deviceService;
+
+    public DeviceController(IDeviceService deviceService)
     {
-        private readonly AppDbContext _context;
+        _deviceService = deviceService;
+    }
 
-        public DeviceController(AppDbContext context)
-        {
-            _context = context;
-        }
+    [HttpGet]
+    public async Task<IActionResult> GetDevices()
+    {
+        var devices = await _deviceService.GetDevicesAsync();
+        return Ok(devices);
+    }
 
-        // GET: Device
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.DeviceDTO.ToListAsync());
-        }
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetDeviceById(int id)
+    {
+        var device = await _deviceService.GetDeviceByIdAsync(id);
+        if (device == null)
+            return NotFound();
 
-        // GET: Device/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        return Ok(device);
+    }
 
-            var deviceDTO = await _context.DeviceDTO
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (deviceDTO == null)
-            {
-                return NotFound();
-            }
+    [HttpPost]
+    public async Task<IActionResult> AddDevice([FromBody] Device device)
+    {
+        await _deviceService.AddDeviceAsync(device);
+        return CreatedAtAction(nameof(GetDeviceById), new { id = device.Id }, device);
+    }
 
-            return View(deviceDTO);
-        }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateDevice(int id, [FromBody] Device device)
+    {
+        if (id != device.Id)
+            return BadRequest();
 
-        // GET: Device/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        await _deviceService.UpdateDeviceAsync(device);
+        return NoContent();
+    }
 
-        // POST: Device/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Type,Status,HealthStatus")] DeviceDTO deviceDTO)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(deviceDTO);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(deviceDTO);
-        }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteDevice(Device id)
+    {
+        await _deviceService.DeleteDeviceAsync(id);
+        return NoContent();
+    }
 
-        // GET: Device/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var deviceDTO = await _context.DeviceDTO.FindAsync(id);
-            if (deviceDTO == null)
-            {
-                return NotFound();
-            }
-            return View(deviceDTO);
-        }
-
-        // POST: Device/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,Status,HealthStatus")] DeviceDTO deviceDTO)
-        {
-            if (id != deviceDTO.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(deviceDTO);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DeviceDTOExists(deviceDTO.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(deviceDTO);
-        }
-
-        // GET: Device/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var deviceDTO = await _context.DeviceDTO
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (deviceDTO == null)
-            {
-                return NotFound();
-            }
-
-            return View(deviceDTO);
-        }
-
-        // POST: Device/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var deviceDTO = await _context.DeviceDTO.FindAsync(id);
-            if (deviceDTO != null)
-            {
-                _context.DeviceDTO.Remove(deviceDTO);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool DeviceDTOExists(int id)
-        {
-            return _context.DeviceDTO.Any(e => e.Id == id);
-        }
+    [HttpGet("order/{orderBy}")]
+    public async Task<IActionResult> GetDevicesOrdered(string orderBy)
+    {
+        var devices = await _deviceService.GetDevicesOrderedAsync(orderBy);
+        return Ok(devices);
     }
 }
