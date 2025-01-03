@@ -1,5 +1,6 @@
 ﻿using NimbusPulseAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using NimbusPulseAPI.DTOs;
 
 
@@ -20,10 +21,15 @@ namespace NimbusPulseAPI.Context
             // Constructor
             public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
+            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            {
+                optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+                base.OnConfiguring(optionsBuilder);
+            }
+
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 // İlişkileri tanımlama
-
                 modelBuilder.Entity<Notification>()
                     .HasOne(n => n.User)
                     .WithMany()
@@ -42,22 +48,25 @@ namespace NimbusPulseAPI.Context
                     .HasForeignKey<ResourceUsage>(r => r.DeviceId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-            {
                 modelBuilder.Entity<Application>()
                     .HasOne(a => a.Device)
                     .WithMany(d => d.Applications)
                     .HasForeignKey(a => a.DeviceId)
-                    .OnDelete(DeleteBehavior.Cascade); // Cihaz silindiğinde bağlı uygulamaları da sil
-
-                modelBuilder.Entity<Device>()
-                    .HasOne(d => d.ResourceUsage)
-                    .WithOne()
-                    .HasForeignKey<ResourceUsage>(r => r.Id)
                     .OnDelete(DeleteBehavior.Cascade);
-            }
 
-            modelBuilder.Ignore<DeviceDTO>();
+                // DTO'ları ignore et
+                modelBuilder.Ignore<DeviceDTO>();
+                modelBuilder.Ignore<CreateDeviceWithAppsDTO>();
+                modelBuilder.Ignore<DeviceDetailsDTO>();
+                modelBuilder.Ignore<ResourceUsageDTO>();
+                modelBuilder.Ignore<BackgroundAppDTO>();
+                modelBuilder.Ignore<ActiveAppDTO>();
+                modelBuilder.Ignore<ApplicationDTO>();
+
+                // Seed data
+                new DbInitializer(modelBuilder).Seed();
             }
+            
         }
     
 

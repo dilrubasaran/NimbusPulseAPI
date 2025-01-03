@@ -38,6 +38,25 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Veritabanını oluştur ve seed data'yı ekle
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        
+        // Veritabanını sil ve yeniden oluştur
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Veritabanı oluşturulurken bir hata oluştu.");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
