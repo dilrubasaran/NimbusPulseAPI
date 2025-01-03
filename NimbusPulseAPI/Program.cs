@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NimbusPulseAPI.Context;
-
+using NimbusPulseAPI.Models;
 using NimbusPulseAPI.MappingProfile;
 using NimbusPulseAPI.Repository;
 using NimbusPulseAPI.Services;
@@ -17,6 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IRepository<Settings>, Repository<Settings>>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();

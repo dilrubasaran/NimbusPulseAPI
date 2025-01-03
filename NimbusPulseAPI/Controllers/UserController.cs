@@ -79,26 +79,6 @@ namespace NimbusPulseAPI.Controllers
             }
         }
 
-        // PUT: api/User/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest("ID mismatch.");
-            }
-
-            try
-            {
-                await _userService.UpdateAsync(user);
-                return Ok("User updated successfully.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         // DELETE: api/User/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -113,6 +93,48 @@ namespace NimbusPulseAPI.Controllers
             {
                 await _userService.DeleteAsync(user);
                 return Ok("User deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}/profile")]
+        public async Task<IActionResult> UpdateProfile(int id, [FromBody] ProfileUpdateDTO profileDto)
+        {
+            try
+            {
+                await _userService.UpdateProfileAsync(id, profileDto);
+                return Ok("Profile updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}/theme")]
+        public async Task<IActionResult> UpdateTheme(int id, [FromBody] ThemeUpdateDTO themeDto)
+        {
+            try
+            {
+                await _userService.UpdateThemeAndLanguageAsync(id, themeDto);
+                return Ok("Theme and language updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}/security-code")]
+        public async Task<IActionResult> UpdateSecurityCode(int id, [FromBody] SecurityCodeChangeDTO securityDto)
+        {
+            try
+            {
+                await _userService.UpdateSecurityCodeAsync(id, securityDto);
+                return Ok("Security code updated successfully");
             }
             catch (Exception ex)
             {
