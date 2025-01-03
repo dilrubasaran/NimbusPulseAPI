@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NimbusPulseAPI.Models;
 using NimbusPulseAPI.Services;
+using AutoMapper;
+using NimbusPulseAPI.DTOs;
 
 [Route("api/[controller]")]
 [ApiController]
 public class DeviceController : ControllerBase
 {
     private readonly IDeviceService _deviceService;
+    private readonly IMapper _mapper;
 
-    public DeviceController(IDeviceService deviceService)
+    public DeviceController(IDeviceService deviceService, IMapper mapper)
     {
         _deviceService = deviceService;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -31,8 +35,14 @@ public class DeviceController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddDevice([FromBody] Device device)
+    public async Task<IActionResult> AddDevice([FromBody] DeviceDTO deviceDto)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var device = _mapper.Map<Device>(deviceDto);
+        device.LastReportDate = DateTime.UtcNow;
+        
         await _deviceService.AddDeviceAsync(device);
         return CreatedAtAction(nameof(GetDeviceById), new { id = device.Id }, device);
     }
@@ -59,5 +69,29 @@ public class DeviceController : ControllerBase
     {
         var devices = await _deviceService.GetDevicesOrderedAsync(orderBy);
         return Ok(devices);
+    }
+
+    [HttpPost("with-applications")]
+    public async Task<IActionResult> AddDeviceWithApplications([FromBody] CreateDeviceWithAppsDTO deviceDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var device = _mapper.Map<Device>(deviceDto);
+        device.LastReportDate = DateTime.UtcNow;
+        device.Applications = _mapper.Map<List<Application>>(deviceDto.Applications);
+
+        await _deviceService.AddDeviceWithApplicationsAsync(device);
+        return CreatedAtAction(nameof(GetDeviceById), new { id = device.Id }, device);
+    }
+
+    [HttpGet("details/{id}")]
+    public async Task<IActionResult> GetDeviceDetails(int id)
+    {
+        var deviceDetails = await _deviceService.GetDeviceDetailsAsync(id);
+        if (deviceDetails == null)
+            return NotFound();
+
+        return Ok(deviceDetails);
     }
 }

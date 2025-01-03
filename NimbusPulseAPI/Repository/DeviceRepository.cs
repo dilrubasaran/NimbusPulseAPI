@@ -9,7 +9,9 @@ namespace NimbusPulseAPI.Repository
     {
         Task<IEnumerable<Device>> GetDevicesByStatusAsync(string status);
         Task<IEnumerable<Device>> GetDevicesOrderedAsync(Func<IQueryable<Device>, IOrderedQueryable<Device>> orderBy);
-        Task UpdateAsync(Device entity); // Add this line
+        Task UpdateAsync(Device entity);
+        Task AddDeviceWithApplicationsAsync(Device device);
+        Task<Device> GetDeviceWithApplicationsAsync(int id);
     }
 
 
@@ -31,6 +33,20 @@ namespace NimbusPulseAPI.Repository
         {
             var query = _context.Devices.AsQueryable();
             return await orderBy(query).ToListAsync();
+        }
+
+        public async Task AddDeviceWithApplicationsAsync(Device device)
+        {
+            await _context.Devices.AddAsync(device);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Device> GetDeviceWithApplicationsAsync(int id)
+        {
+            return await _context.Devices
+                .Include(d => d.Applications)
+                .Include(d => d.ResourceUsage)
+                .FirstOrDefaultAsync(d => d.Id == id);
         }
     }
 

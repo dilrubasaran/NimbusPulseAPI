@@ -56,9 +56,8 @@ namespace NimbusPulseAPI.Context
                     .OnDelete(DeleteBehavior.Cascade);
             }
 
-
+            modelBuilder.Ignore<DeviceDTO>();
             }
-        public DbSet<NimbusPulseAPI.DTOs.DeviceDTO> DeviceDTO { get; set; } = default!;
         }
     
 

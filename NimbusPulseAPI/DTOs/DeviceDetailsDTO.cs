@@ -2,30 +2,51 @@
 {
     public class DeviceDetailsDTO
     {
-            public int Id { get; set; }
-            public string Name { get; set; } // Cihaz ismi
-            public string Type { get; set; } // Cihaz türü (Laptop, VM vs.)
-            public string HealthStatus { get; set; } // Sunucu durumu
-            public string OperatingSystem { get; set; } // İşletim sistemi
-            public string IpAddress { get; set; } // Cihaz IP adresi
-            public DateTime LastReportDate { get; set; } // Verinin gönderildiği tarih
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string OperatingSystem { get; set; }
+        public string IpAddress { get; set; }
+        public string Status { get; set; }
+        public string HealthStatus { get; set; }
+        public DateTime LastReportDate { get; set; }
 
-            // Kaynak Kullanımı
-            public double CpuUsagePercentage { get; set; }
-            public double RamUsagePercentage { get; set; }
-            public double DiskUsagePercentage { get; set; }
+        // Genel Kaynak Kullanımı
+        public ResourceUsageDTO ResourceUsage { get; set; }
 
-            // Uygulamalar
-            public List<ApplicationUsageDTO> ActiveApplications { get; set; }
-            public List<ApplicationUsageDTO> InactiveApplications { get; set; }
-        }
+        // Arka Planda Çalışan Uygulamalar
+        public List<BackgroundAppDTO> BackgroundApplications { get; set; }
 
-        public class ApplicationUsageDTO
-        {
-            public string Name { get; set; } // Uygulama adı
-            public TimeSpan Duration { get; set; } // Çalışma süresi
-            public double CpuUsagePercentage { get; set; } // CPU kullanımı
-            public double RamUsagePercentage { get; set; } // RAM kullanımı
-        }
-    
+        // Aktif Çalışan Uygulamalar
+        public List<ActiveAppDTO> ActiveApplications { get; set; }
+    }
+
+    public class ResourceUsageDTO
+    {
+        public List<double> CpuHistory { get; set; } // CPU kullanım geçmişi grafiği için
+        public List<double> RamHistory { get; set; } // RAM kullanım geçmişi grafiği için
+        public double CurrentCpuUsage { get; set; }
+        public double CurrentRamUsage { get; set; }
+        public double CurrentDiskUsage { get; set; }
+    }
+
+    public class BackgroundAppDTO
+    {
+        public string Name { get; set; }
+        public TimeSpan RunningTime { get; set; }
+        public double CpuUsage { get; set; }
+        public double RamUsage { get; set; }
+    }
+
+    public class ActiveAppDTO
+    {
+        public string Name { get; set; }
+        public string Status { get; set; }
+        public TimeSpan RunningTime { get; set; }
+        public double CpuUsage { get; set; }
+        public double RamUsage { get; set; }
+        // Küçük grafik için geçmiş veriler
+        public List<double> CpuHistory { get; set; }
+        public List<double> RamHistory { get; set; }
+    }
 }

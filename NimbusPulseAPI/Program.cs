@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NimbusPulseAPI.Context;
-using NimbusPulseAPI.Infrastructure;
-using NimbusPulseAPI.Infrastructure.Seed;
+
 using NimbusPulseAPI.MappingProfile;
 using NimbusPulseAPI.Repository;
 using NimbusPulseAPI.Services;
@@ -19,8 +18,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserService, UserService>();
-//builder.Services.AddScoped<IDeviceService, DeviceService>();
-builder.Services.AddAutoMapper(typeof(UserMappingProfile), typeof(DeviceMappingProfile));
+builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+builder.Services.AddScoped<IDeviceService, DeviceService>();
+builder.Services.AddAutoMapper(typeof(UserMappingProfile), typeof(DeviceMappingProfile), typeof(Program));
 
 
 
@@ -48,14 +48,14 @@ if (app.Environment.IsDevelopment())
 
 //Midleware
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    if (dbContext.Database.EnsureCreated())  // Eðer veritabaný yoksa oluþturuluyor
-    {
-        DataSeeder.SeedDatabase(dbContext);  // Veritabanýný seed et
-    }
-}
+// using (var scope = app.Services.CreateScope())
+// {
+//     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//     if (dbContext.Database.EnsureCreated())  // Eï¿½er veritabanï¿½ yoksa oluï¿½turuluyor
+//     {
+//         DataSeeder.SeedDatabase(dbContext);  // Veritabanï¿½nï¿½ seed et
+//     }
+// }
 app.UseCors("AllowAllOrigins");
 app.UseHttpsRedirection();
 

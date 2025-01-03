@@ -1,11 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace NimbusPulseAPI.DTOs
 {
-    public class DeviceDTO
+    public class CreateDeviceWithAppsDTO
     {
-        public int Id { get; set; }
-
+        // Device bilgileri
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }
 
@@ -23,5 +22,18 @@ namespace NimbusPulseAPI.DTOs
 
         [Required(ErrorMessage = "Health Status is required")]
         public string HealthStatus { get; set; }
+
+        // Application listesi
+        public List<ApplicationDTO> Applications { get; set; }
     }
-}
+
+    public class ApplicationDTO
+    {
+        [Required]
+        public string Name { get; set; }
+        public string Status { get; set; }
+        public double CpuUsage { get; set; }
+        public double MemoryUsage { get; set; }
+        public TimeSpan RunningTime { get; set; }
+    }
+} 
