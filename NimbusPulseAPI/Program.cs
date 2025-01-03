@@ -46,9 +46,12 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<AppDbContext>();
         
-        // Veritabanını sil ve yeniden oluştur
-        context.Database.EnsureDeleted();
-        context.Database.EnsureCreated();
+        // Veritabanı yoksa oluştur
+        if (!context.Database.EnsureCreated())
+        {
+            // Veritabanı zaten varsa migration'ları uygula
+            context.Database.Migrate();
+        }
     }
     catch (Exception ex)
     {

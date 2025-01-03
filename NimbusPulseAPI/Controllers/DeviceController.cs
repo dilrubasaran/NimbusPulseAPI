@@ -58,11 +58,19 @@ public class DeviceController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteDevice(Device id)
+    public async Task<IActionResult> DeleteDevice(int id)
     {
-        await _deviceService.DeleteDeviceAsync(id);
-        return NoContent();
+        var device = await _deviceService.GetDeviceByIdAsync(id);
+        if (device == null)
+        {
+            return NotFound("Device not found");
+        }
+
+        await _deviceService.DeleteDeviceAsync(device);
+        return Ok("Device deleted successfully");
     }
+
+    
 
     [HttpGet("order/{orderBy}")]
     public async Task<IActionResult> GetDevicesOrdered(string orderBy)

@@ -19,56 +19,137 @@ namespace NimbusPulseAPI.Context
             modelBuilder.Entity<User>().HasData(users);
 
             // Seed Data - Device
-            var devices = Enumerable.Range(1, 20).Select(id => new Device
+            var devices = new List<Device>();
+            int deviceId = 1;
+
+            // 13 Active-Good Device
+            for (int i = 0; i < 13; i++)
             {
-                Id = id,
-                Name = $"Device{id:D2}",
-                Type = id % 2 == 0 ? "Virtual Machine" : "Physical Machine",
-                OperatingSystem = id % 3 == 0 ? "Linux" : "Windows Server",
-                IpAddress = $"192.168.{id / 10}.{id}",
-                Status = id % 5 == 0 ? "Inactive" : "Active",
-                HealthStatus = id % 4 == 0 ? "Critical" : id % 3 == 0 ? "Requires Check" : "Good",
-                LastReportDate = DateTime.UtcNow.AddHours(-id)
-            }).ToArray();
+                devices.Add(new Device
+                {
+                    Id = deviceId++,
+                    Name = $"Server{i + 1:D2}",
+                    Type = i % 2 == 0 ? "Virtual Machine" : "Physical Server",
+                    OperatingSystem = i % 3 == 0 ? "Linux" : "Windows Server",
+                    IpAddress = $"192.168.{i / 10}.{i % 10}",
+                    Status = "Active",
+                    HealthStatus = "Good",
+                    LastReportDate = DateTime.UtcNow.AddMinutes(-i * 30)
+                });
+            }
+
+            // 3 Active-Requires Check Device
+            for (int i = 0; i < 3; i++)
+            {
+                devices.Add(new Device
+                {
+                    Id = deviceId++,
+                    Name = $"Database{i + 1:D2}",
+                    Type = "Database Server",
+                    OperatingSystem = i % 2 == 0 ? "Linux" : "Windows Server",
+                    IpAddress = $"192.168.1.{100 + i}",
+                    Status = "Active",
+                    HealthStatus = "Requires Check",
+                    LastReportDate = DateTime.UtcNow.AddHours(-i)
+                });
+            }
+
+            // 2 Active-Critical Device
+            for (int i = 0; i < 2; i++)
+            {
+                devices.Add(new Device
+                {
+                    Id = deviceId++,
+                    Name = $"Gateway{i + 1:D2}",
+                    Type = "Network Device",
+                    OperatingSystem = "Linux",
+                    IpAddress = $"192.168.2.{i + 1}",
+                    Status = "Active",
+                    HealthStatus = "Critical",
+                    LastReportDate = DateTime.UtcNow.AddMinutes(-15)
+                });
+            }
+
+            // 2 Inactive Device
+            for (int i = 0; i < 2; i++)
+            {
+                devices.Add(new Device
+                {
+                    Id = deviceId++,
+                    Name = $"Backup{i + 1:D2}",
+                    Type = "Storage Server",
+                    OperatingSystem = "Windows Server",
+                    IpAddress = $"192.168.3.{i + 1}",
+                    Status = "Inactive",
+                    HealthStatus = "Unknown",
+                    LastReportDate = DateTime.UtcNow.AddDays(-1)
+                });
+            }
+
             modelBuilder.Entity<Device>().HasData(devices);
 
-            // Seed Data - Application (Background Apps)
-            var backgroundApps = Enumerable.Range(1, 100).Select(id => new Application
-            {
-                Id = id,
-                DeviceId = 1, // Hepsi Device 1'e bağlı
-                Name = $"BackgroundApp{id}",
-                Status = "Inactive",
-                RunningTime = TimeSpan.FromHours(id % 24),
-                CpuUsage = 5 + (id % 10), // 5-15 arası CPU kullanımı
-                RamUsage = 10 + (id % 15) // 10-25 arası RAM kullanımı
-            }).ToArray();
+            // Her cihaz için uygulamalar oluştur
+            var applications = new List<Application>();
+            int appId = 1;
 
-            // Seed Data - Application (Active Apps)
-            var activeApps = Enumerable.Range(101, 8).Select(id => new Application
+            foreach (var device in devices)
             {
-                Id = id,
-                DeviceId = 1, // Hepsi Device 1'e bağlı
-                Name = $"ActiveApp{id-100}", // 1'den 8'e kadar
-                Status = "Active",
-                RunningTime = TimeSpan.FromHours(id % 24),
-                CpuUsage = 30 + (id % 20), // 30-50 arası CPU kullanımı
-                RamUsage = 40 + (id % 30) // 40-70 arası RAM kullanımı
-            }).ToArray();
+                // Aktif cihazlar için daha fazla uygulama
+                if (device.Status == "Active")
+                {
+                    // 4-8 arası aktif uygulama
+                    int activeAppCount = new Random().Next(4, 9);
+                    for (int i = 0; i < activeAppCount; i++)
+                    {
+                        applications.Add(new Application
+                        {
+                            Id = appId++,
+                            DeviceId = device.Id,
+                            Name = $"ActiveApp_{device.Id}_{i + 1}",
+                            Status = "Active",
+                            RunningTime = TimeSpan.FromHours(new Random().Next(1, 72)),
+                            CpuUsage = 30 + new Random().Next(0, 40),
+                            RamUsage = 40 + new Random().Next(0, 35)
+                        });
+                    }
 
-            var allApps = backgroundApps.Concat(activeApps).ToArray();
-            modelBuilder.Entity<Application>().HasData(allApps);
+                    // 20-30 arası background uygulama
+                    int bgAppCount = new Random().Next(20, 31);
+                    for (int i = 0; i < bgAppCount; i++)
+                    {
+                        applications.Add(new Application
+                        {
+                            Id = appId++,
+                            DeviceId = device.Id,
+                            Name = $"BgApp_{device.Id}_{i + 1}",
+                            Status = "Inactive",
+                            RunningTime = TimeSpan.FromHours(new Random().Next(1, 48)),
+                            CpuUsage = new Random().Next(5, 15),
+                            RamUsage = new Random().Next(10, 25)
+                        });
+                    }
+                }
+            }
 
-            // Seed Data - ResourceUsage
-            var resourceUsage = new ResourceUsage
+            modelBuilder.Entity<Application>().HasData(applications);
+
+            // Her aktif cihaz için kaynak kullanımı
+            var resourceUsages = devices.Where(d => d.Status == "Active").Select(device => new ResourceUsage
             {
-                Id = 1,
-                DeviceId = 1,
-                CpuUsage = 45.5,
-                RamUsage = 62.3,
-                DiskUsage = 78.1
-            };
-            modelBuilder.Entity<ResourceUsage>().HasData(resourceUsage);
+                Id = device.Id,
+                DeviceId = device.Id,
+                CpuUsage = device.HealthStatus == "Critical" ? 85 + new Random().Next(0, 15) :
+                           device.HealthStatus == "Requires Check" ? 70 + new Random().Next(0, 15) :
+                           40 + new Random().Next(0, 30),
+                RamUsage = device.HealthStatus == "Critical" ? 90 + new Random().Next(0, 10) :
+                           device.HealthStatus == "Requires Check" ? 75 + new Random().Next(0, 15) :
+                           50 + new Random().Next(0, 30),
+                DiskUsage = device.HealthStatus == "Critical" ? 95 + new Random().Next(0, 5) :
+                            device.HealthStatus == "Requires Check" ? 80 + new Random().Next(0, 10) :
+                            60 + new Random().Next(0, 20)
+            }).ToList();
+
+            modelBuilder.Entity<ResourceUsage>().HasData(resourceUsages);
 
             // Seed Data - Log
             var logs = Enumerable.Range(1, 100).Select(id => new Log

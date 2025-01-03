@@ -1,14 +1,17 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using NimbusPulseAPI.Context;
 using NimbusPulseAPI.Repository;
 
 public class Repository<T> : IRepository<T> where T : class
 {
     private readonly AppDbContext _context;
+    private readonly DbSet<T> _dbSet;
 
     public Repository(AppDbContext context)
     {
         _context = context;
+        _dbSet = context.Set<T>();
     }
 
     public async Task<IQueryable<T>> GetAllAsync()
@@ -38,9 +41,9 @@ public class Repository<T> : IRepository<T> where T : class
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(T entity)
+    public virtual async Task DeleteAsync(T entity)
     {
-        _context.Set<T>().Remove(entity);
+        _dbSet.Remove(entity);
         await _context.SaveChangesAsync();
     }
 }

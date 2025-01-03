@@ -9,10 +9,10 @@ namespace NimbusPulseAPI.Services
     public interface IDeviceService
     {
         Task<IEnumerable<DeviceDTO>> GetDevicesAsync();
-        Task<DeviceDetailsDTO> GetDeviceByIdAsync(int id);
+        Task<Device> GetDeviceByIdAsync(int id);
         Task AddDeviceAsync(Device device);
         Task UpdateDeviceAsync(Device device);
-        Task DeleteDeviceAsync(Device id);
+        Task DeleteDeviceAsync(Device device);
         Task<IEnumerable<DeviceDTO>> GetDevicesOrderedAsync(string orderBy);
         Task AddDeviceWithApplicationsAsync(Device device);
         Task<DeviceDetailsDTO> GetDeviceDetailsAsync(int id);
@@ -35,10 +35,9 @@ namespace NimbusPulseAPI.Services
             return _mapper.Map<IEnumerable<DeviceDTO>>(devices);
         }
 
-        public async Task<DeviceDetailsDTO> GetDeviceByIdAsync(int id)
+        public async Task<Device> GetDeviceByIdAsync(int id)
         {
-            var device = await _deviceRepository.GetByIdAsync(id);
-            return _mapper.Map<DeviceDetailsDTO>(device);
+            return await _deviceRepository.GetByIdAsync(id);
         }
 
         public async Task AddDeviceAsync(Device device)
@@ -52,10 +51,14 @@ namespace NimbusPulseAPI.Services
         }
 
 
-        public async Task DeleteDeviceAsync(Device id)
+        public async Task DeleteDeviceAsync(Device device)
         {
-            await _deviceRepository.DeleteAsync(id);
+            await _deviceRepository.DeleteAsync(device);
         }
+
+
+
+
         //Todo: IQuerable düzeltS
         public async Task<IEnumerable<DeviceDTO>> GetDevicesOrderedAsync(string orderBy)
         {

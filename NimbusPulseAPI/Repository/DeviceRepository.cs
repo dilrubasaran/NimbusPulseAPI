@@ -48,6 +48,34 @@ namespace NimbusPulseAPI.Repository
                 .Include(d => d.ResourceUsage)
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
+
+        public override async Task DeleteAsync(Device device)
+        {
+            // İlişkili uygulamaları ve kaynak kullanımını yükle
+            var deviceToDelete = await _context.Devices
+                .Include(d => d.Applications)
+                .Include(d => d.ResourceUsage)
+                .FirstOrDefaultAsync(d => d.Id == device.Id);
+
+            if (deviceToDelete != null)
+            {
+                // İlişkili uygulamaları sil
+                if (deviceToDelete.Applications != null)
+                {
+                    _context.Applications.RemoveRange(deviceToDelete.Applications);
+                }
+
+                // İlişkili kaynak kullanımını sil
+                if (deviceToDelete.ResourceUsage != null)
+                {
+                    _context.ResourceUsages.Remove(deviceToDelete.ResourceUsage);
+                }
+
+                // Cihazı sil
+                _context.Devices.Remove(deviceToDelete);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 
 }

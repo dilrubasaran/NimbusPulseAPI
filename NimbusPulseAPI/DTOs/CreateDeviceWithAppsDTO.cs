@@ -6,22 +6,22 @@ namespace NimbusPulseAPI.DTOs
     {
         // Device bilgileri
         [Required(ErrorMessage = "Name is required")]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         [Required(ErrorMessage = "Type is required")]
-        public string Type { get; set; }
+        public required string Type { get; set; }
 
         [Required(ErrorMessage = "Operating System is required")]
-        public string OperatingSystem { get; set; }
+        public required string OperatingSystem { get; set; }
 
         [Required(ErrorMessage = "IP Address is required")]
-        public string IpAddress { get; set; }
+        public required string IpAddress { get; set; }
 
         [Required(ErrorMessage = "Status is required")]
-        public string Status { get; set; }
+        public required string Status { get; set; }
 
         [Required(ErrorMessage = "Health Status is required")]
-        public string HealthStatus { get; set; }
+        public required string HealthStatus { get; set; }
 
         // Application listesi
         public List<ApplicationDTO> Applications { get; set; }
@@ -31,9 +31,10 @@ namespace NimbusPulseAPI.DTOs
     {
         [Required]
         public string Name { get; set; }
-        public string Status { get; set; }
+        public  string Status { get; set; }
         public double CpuUsage { get; set; }
         public double MemoryUsage { get; set; }
+        public double RamUsage { get; set; }
         public TimeSpan RunningTime { get; set; }
     }
 } 
