@@ -43,6 +43,7 @@ namespace NimbusPulseAPI.Services
         public async Task AddDeviceAsync(Device device)
         {
             await _deviceRepository.AddAsync(device);
+            
         }
 
         public async Task UpdateDeviceAsync(Device device)
@@ -66,14 +67,14 @@ namespace NimbusPulseAPI.Services
             {
                 "name" => q => q.OrderBy(d => d.Name),
                 "status" => q => q.OrderBy(d => d.Status),
-                "criticality" => q => q.OrderBy(d => d.HealthStatus == "Kritik" ? 1
-                    : d.HealthStatus == "Kontrol Gerektiriyor" ? 2
-                    : 3), // Öncelik sırasına göre sıralama
+                "criticality" => q => q.OrderBy(d => d.HealthStatus == "Critical" ? 1 
+                    : d.HealthStatus == "Requires Check" ? 2 
+                    : 3),
                 _ => q => q.OrderBy(d => d.Name)
             };
 
             var devices = await _deviceRepository.GetDevicesOrderedAsync(orderByExpression);
-            return _mapper.Map<IQueryable<DeviceDTO>>(devices);
+            return _mapper.Map<IEnumerable<DeviceDTO>>(devices);
         }
 
         public async Task AddDeviceWithApplicationsAsync(Device device)
