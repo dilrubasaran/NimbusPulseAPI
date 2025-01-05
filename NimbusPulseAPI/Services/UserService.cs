@@ -14,6 +14,7 @@ namespace NimbusPulseAPI.Services
         Task UpdateProfileAsync(int userId, ProfileUpdateDTO profileDto);
         Task UpdateThemeAndLanguageAsync(int userId, ThemeUpdateDTO themeDto);
         Task UpdateSecurityCodeAsync(int userId, SecurityCodeChangeDTO securityDto);
+        Task UpdatePasswordAsync(int userId, PasswordChangeDTO passwordDTO);
     }
     public class UserService : IUserService
     {
@@ -124,6 +125,22 @@ namespace NimbusPulseAPI.Services
             user.PhoneNumber = profileDto.PhoneNumber;
             user.ProfilePictureUrl = profileDto.ProfilePictureUrl;
 
+            await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task UpdatePasswordAsync(int userId, PasswordChangeDTO passwordDTO)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new Exception("User not found");
+
+            if (user.Password != passwordDTO.CurrentPassword)
+                throw new Exception("Current password is incorrect");
+
+            if (passwordDTO.NewPassword != passwordDTO.ConfirmNewPassword)
+                throw new Exception("New passwords do not match");
+
+            user.Password = passwordDTO.NewPassword;
             await _userRepository.UpdateAsync(user);
         }
 

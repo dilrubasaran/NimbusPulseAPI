@@ -30,9 +30,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", policy =>
     {
-        policy.AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
+        policy.WithOrigins("http://localhost:3000",     // Flutter web port
+                          "http://localhost:5166",      // HTTP port
+                          "https://localhost:7185")     // HTTPS port
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -79,9 +82,10 @@ if (app.Environment.IsDevelopment())
 //         DataSeeder.SeedDatabase(dbContext);  // Veritaban�n� seed et
 //     }
 // }
-app.UseCors("AllowAllOrigins");
 app.UseHttpsRedirection();
-
+app.UseRouting();
+app.UseCors("AllowAllOrigins"); 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

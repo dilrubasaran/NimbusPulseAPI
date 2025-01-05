@@ -141,5 +141,19 @@ namespace NimbusPulseAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut("{id}/password")]
+        public async Task<IActionResult> UpdatePassword(int id, [FromBody] PasswordChangeDTO passwordDto)
+        {
+            try
+            {
+                await _userService.UpdatePasswordAsync(id, passwordDto);
+                return Ok("Password updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
