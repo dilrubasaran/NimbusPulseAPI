@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using NimbusPulseAPI.DTOs;
+﻿using NimbusPulseAPI.DTOs;
 using NimbusPulseAPI.Models;
 using NimbusPulseAPI.Repository;
 using System.Linq.Expressions;
+using Mapster;
 
 namespace NimbusPulseAPI.Services
 {
@@ -20,13 +20,13 @@ namespace NimbusPulseAPI.Services
     {
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<Settings> _settingsRepository;
-        private readonly IMapper _mapper;
+     
 
-        public UserService(IRepository<User> userRepository, IRepository<Settings> settingsRepository, IMapper mapper)
+        public UserService(IRepository<User> userRepository, IRepository<Settings> settingsRepository)
         {
             _userRepository = userRepository;
             _settingsRepository = settingsRepository;
-            _mapper = mapper;
+         
         }
 
         // IRepository CRUD metotlarının implementasyonu
@@ -83,7 +83,7 @@ namespace NimbusPulseAPI.Services
                 await _settingsRepository.AddAsync(settings);
 
                 // Sonra User oluştur ve Settings ile ilişkilendir
-                var user = _mapper.Map<User>(registerDto);
+                var user = registerDto.Adapt<User>();
                 user.SettingsId = settings.Id;
                 user.CreatedAt = DateTime.UtcNow;
                 await _userRepository.AddAsync(user);
@@ -110,7 +110,7 @@ namespace NimbusPulseAPI.Services
                 throw new Exception("Invalid email or password.");
             }
 
-            return _mapper.Map<LoginDTO>(user);
+            return user.Adapt<LoginDTO>();
         }
 
         public async Task UpdateProfileAsync(int userId, ProfileUpdateDTO profileDto)

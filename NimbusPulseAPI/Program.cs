@@ -1,11 +1,15 @@
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using NimbusPulseAPI.Context;
+using NimbusPulseAPI.Mapping;
 using NimbusPulseAPI.Models;
-using NimbusPulseAPI.MappingProfile;
+using NimbusPulseAPI.Mapping;
 using NimbusPulseAPI.Repository;
 using NimbusPulseAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 
@@ -21,9 +25,15 @@ builder.Services.AddScoped<IRepository<Settings>, Repository<Settings>>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();
-builder.Services.AddAutoMapper(typeof(UserMappingProfile), typeof(DeviceMappingProfile), typeof(Program));
 
+builder.Services.AddMapster();
+builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings); // Global konfigürasyonu servislere ekler
+builder.Services.AddScoped<IMapper, Mapper>(); // Mapper servisini inject et
 
+//mapping dosyaları ekleme 
+var config = TypeAdapterConfig.GlobalSettings;
+config.Scan(typeof(DeviceMapping).Assembly);  //Todo:? DeviceMapping ve diğer mappingleri burada register edebilirsin
+config.Scan(typeof(UserMapping).Assembly);
 
 
 builder.Services.AddCors(options =>

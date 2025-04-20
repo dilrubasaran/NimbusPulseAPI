@@ -2,6 +2,7 @@
 using NimbusPulseAPI.Models;
 using NimbusPulseAPI.Services;
 using AutoMapper;
+using Mapster;
 using NimbusPulseAPI.DTOs;
 
 [Route("api/[controller]")]
@@ -9,12 +10,12 @@ using NimbusPulseAPI.DTOs;
 public class DeviceController : ControllerBase
 {
     private readonly IDeviceService _deviceService;
-    private readonly IMapper _mapper;
 
-    public DeviceController(IDeviceService deviceService, IMapper mapper)
+
+    public DeviceController(IDeviceService deviceService)
     {
         _deviceService = deviceService;
-        _mapper = mapper;
+       
     }
 
     [HttpGet]
@@ -40,7 +41,9 @@ public class DeviceController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var device = _mapper.Map<Device>(deviceDto);
+        var device = deviceDto.Adapt<Device>();
+        
+
         device.LastReportDate = DateTime.UtcNow;
         
         await _deviceService.AddDeviceAsync(device);
@@ -85,9 +88,9 @@ public class DeviceController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var device = _mapper.Map<Device>(deviceDto);
+        var device = deviceDto.Adapt<Device>();
         device.LastReportDate = DateTime.UtcNow;
-        device.Applications = _mapper.Map<List<Application>>(deviceDto.Applications);
+        device.Applications = deviceDto.Applications.Adapt<List<Application>>();
 
         await _deviceService.AddDeviceWithApplicationsAsync(device);
         return CreatedAtAction(nameof(GetDeviceById), new { id = device.Id }, device);

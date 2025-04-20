@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Mapster;
 using NimbusPulseAPI.DTOs;
 using NimbusPulseAPI.Models;
 using NimbusPulseAPI.Repository;
@@ -21,18 +22,19 @@ namespace NimbusPulseAPI.Services
     public class DeviceService : IDeviceService
     {
         private readonly IDeviceRepository _deviceRepository;
-        private readonly IMapper _mapper;
+        
 
-        public DeviceService(IDeviceRepository deviceRepository, IMapper mapper)
+        public DeviceService(IDeviceRepository deviceRepository)
         {
             _deviceRepository = deviceRepository;
-            _mapper = mapper;
+          
         }
 
         public async Task<IEnumerable<DeviceDTO>> GetDevicesAsync()
         {
             var devices = await _deviceRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<DeviceDTO>>(devices);
+            return devices.Adapt<IEnumerable<DeviceDTO>>();
+            
         }
 
         public async Task<Device> GetDeviceByIdAsync(int id)
@@ -74,7 +76,9 @@ namespace NimbusPulseAPI.Services
             };
 
             var devices = await _deviceRepository.GetDevicesOrderedAsync(orderByExpression);
-            return _mapper.Map<IEnumerable<DeviceDTO>>(devices);
+            return devices.Adapt<IEnumerable<DeviceDTO>>();
+          
+
         }
 
         public async Task AddDeviceWithApplicationsAsync(Device device)
@@ -88,8 +92,9 @@ namespace NimbusPulseAPI.Services
             if (device == null)
                 return null;
 
-            var deviceDetails = _mapper.Map<DeviceDetailsDTO>(device);
-            
+            var deviceDetails = device.Adapt<DeviceDetailsDTO>();
+
+
             // Uygulamaları ayır
             deviceDetails.BackgroundApplications = device.Applications
                 .Where(a => a.Status != "Active")
