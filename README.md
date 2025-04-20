@@ -34,8 +34,9 @@ Uygulama iş mantığı, Servis Katmanı aracılığıyla ayrıştırılmış ve
 Cihaz Servisi: Cihaz performans bilgilerini işlemek ve analiz etmek.
 Rapor Servisi: Veritabanından alınan verileri analiz edip dışa aktarılabilir raporlar oluşturmak (PDF, Excel).
 
-### 🔄 AutoMapper Kullanımı
-Model ve DTO dönüşümleri için AutoMapper kullanılmıştır. Bu sayede veriler API katmanında daha sade ve kullanışlı bir biçimde sunulur.
+### 🔄 Mapster Kullanımı
+Projenin ilk sürümünde kullanılan AutoMapper, ileride ücretli lisanslama ihtimali nedeniyle kaldırıldı ve projede daha hafif, esnek bir çözüm olan Mapster kütüphanesine geçildi. Yapı tamamen Mapster kütüphanesine geçirildi.
+Bu refactor süreciyle birlikte artık tüm DTO ↔ Model dönüşümleri Mapster ile yapılmakta.
 
 ### 📄 Veri Transfer Nesneleri (DTO)
 API'nin veri transfer performansını optimize etmek ve gereksiz bilgileri gizlemek amacıyla DTO'lar oluşturulmuştur.
