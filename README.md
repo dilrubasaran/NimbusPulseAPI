@@ -2,6 +2,9 @@
 Nimbus Pulse, bulut ve sunucu izleme işlemleri için geliştirilmiş kapsamlı bir uygulamadır. Hedefimiz, kullanıcıların sistemlerini daha verimli bir şekilde yönetmesini, cihazlarının performansını analiz etmesini ve gerçek zamanlı verilerle optimize edilmiş bir deneyim yaşamasını sağlamaktır.
 
 ## Mobil Uygulama 🎨
+
+https://github.com/dilrubasaran/nimbus_pulse
+
 Nimbus Pulse'un mobil uygulaması, Flutter kullanılarak geliştirilmiş ve kullanıcı dostu bir arayüzle tasarlanmıştır. Uygulama, hem bireysel hem de kurumsal kullanıcıların cihaz performansını kolayca izleyebilmesi ve yönetebilmesi için çeşitli özellikler sunar.
 
 ### 📊 Performans Analizi
